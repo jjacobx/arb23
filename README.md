@@ -1,12 +1,14 @@
-# High Performance Simulations of Quantum Circuits
+# Energy Efficiency of Quantum Statevector Simulation at Scale
 
-This repository contains the files developed as a part of the PhD project *Benchmarking Quantum Advantage*. The idea behind it is to perform high performance simulations of quantum computers, which can be achieved with two general approaches: **statevector evolution** and **tensor network contraction**. The former approach stores and evolves a raw quantum state, while the latter is more flexible and can allow compression or truncation at the cost of precision. 
+This repository contains the resources used in making the paper by J. Adamski, J. Richings and O. T. Brown submitted to the [SC Sustainable Supercomputing workshop][sc-workshop]. 
 
-A large part of the project involves implementation and evaluation of various simulation strategies, focusing on characteristics like runtime, memory footprint, parallelism, accuracy and energy efficiency. The development is done on ARCHER2 and Cirrus hardware, with aid of various software toolkits, such as QuEST, Qiskit, or ITensor. Ultimately, I aim to build a comprehensive and portable framework, which can run effective high performance simulations of quantum computers that are still practical in the contemporary setting. The framework will be particularly useful for modelling quantum processing unit integration as an HPC accelerator. 
+## Abstract
+
+Classical simulations are essential for the development of quantum computing, and their exponential scaling can easily fill any modern supercomputer. In this paper we consider the performance and energy consumption of large Quantum Fourier Transform (QFT) simulations run on ARCHER2, the UK's National Supercomputing Service, with QuEST toolkit. We take into account CPU clock frequency and node memory size, and use cache-blocking to rearrange the circuit, which minimises communications. We find that using 2.00 GHz instead of 2.25 GHz can save as much as 25% of energy at 5% increase in runtime. Higher node memory also has the potential to be more efficient, and cost the user fewer CUs, but at higher runtime penalty. Finally, we present a cache-blocking QFT circuit, which halves the required communication. All our optimisations combined result in 40% faster simulations and 35% energy savings in 44 qubit simulations on 4,096 ARCHER2 nodes. 
 
 ## Statevector Simulations
 
-Performed using [QuEST] and [Qiskit] toolkits. 
+Performed using [QuEST] toolkit. 
 
 
 ### QuEST
@@ -21,13 +23,11 @@ make
 
 Additional arguments to `build.sh`:
 * `-d <path>`: build in a different directory
-* `-l`: enable 64-bit MPI messages (seems broken on ARCHER2)
 * `-p`: enable profiling
 * `-b`: enable non-blocking communications
 
 Available targets: 
 * `qft`: [quantum Fourier transform (QFT)][qft] implemented using 3 methods (*standard*/*built-in*/*cache-blocking*)
-* `rand`: a circuit inspired by [Google's random circuit sampling (RCS)][rcs], but simplified to one-dimensional gates
 * `hbench`: a benchmark of $`n`$ Hadamard gates on a single target qubit $`t`$
 * `swapbench`: a benchmark of $`n`$ SWAP gates between qubits $`t_1`$ and $`t_2`$
 
@@ -39,23 +39,6 @@ To run the built circuits, there are two SLURM scripts in `/jobs/quest-energy`:
 
 To automate experiments, create a file `submit-<experiment-name>.sh` in `/jobs/quest-energy`. A few examples are already provided. 
 
-
-### Qiskit
-
-Qiskit circuits are in the `qiskit/` directory. 
-
-
-
-## Tensor Network Simulations
-
-Performed using [ITensor][itensor] framework. 
-
-Circuits available in the `itensor-projects/` directory
-
-
-
+[sc-workshop]:  https://sites.google.com/view/sc23sustainablescworkshop/home
 [quest]:        https://github.com/QuEST-Kit/QuEST
-[qiskit]:       https://github.com/Qiskit/qiskit-aer
 [qft]:          https://learn.qiskit.org/course/ch-algorithms/quantum-fourier-transform
-[rcs]:          https://www.nature.com/articles/s41586%20019%201666%205
-[itensor]:      https://github.com/ITensor/ITensor
