@@ -1,0 +1,190 @@
+---
+title: "Cache Blocking in QuEST"
+author: "Jakub Adamski"
+date: '`r Sys.Date()`'
+knit: (\(inputFile, encoding) {
+        out_dir <- "rmd";
+        inputFile |> rmarkdown::render(
+          encoding = encoding, 
+          output_dir= file.path(dirname(inputFile), out_dir)
+        )
+      })
+output:
+  html_document: 
+    theme:
+      base_font:
+        google: Prompt
+      heading_font:
+        google: Proza Libre
+---
+
+```{r setup, include = FALSE}
+library(latex2exp)
+library(patchwork)
+library(tidyverse)
+```
+
+
+```{r load-data, include = FALSE}
+exp_had_bl  <- read_delim("proc/quest-energy-had50-bl-proc.csv", delim = ',')
+exp_had_nb  <- read_delim("proc/quest-energy-had50-nb-proc.csv", delim = ',')
+exp_swap_bl <- read_delim("proc/quest-energy-swap50-bl-proc.csv", delim = ',')
+exp_swap_nb <- read_delim("proc/quest-energy-swap50-nb-proc.csv", delim = ',')
+
+NGATES_HAD  <- 50
+NGATES_SWAP <- 50
+```
+
+```{r process-hadamard}
+exp_had_bl <- transmute(
+  exp_had_bl,
+  Communication = "Blocking", 
+  `Target Qubit` = TARGET_IDX, 
+  `Runtime per Gate` = RUNTIME / NGATES_HAD, 
+  `Energy per Gate` = (ENERGY + 1880 * RUNTIME) / NGATES_HAD
+)
+
+exp_had_nb <- transmute(
+  exp_had_nb,
+  Communication = "Nonblocking", 
+  `Target Qubit` = TARGET_IDX, 
+  `Runtime per Gate` = RUNTIME / NGATES_HAD, 
+  `Energy per Gate` = (ENERGY + 1880 * RUNTIME) / NGATES_HAD
+)
+
+exp_had <- bind_rows(exp_had_bl, exp_had_nb) |> 
+  mutate(Communication = as.factor(Communication))
+```
+
+```{r plot-hadamard-runtime}
+plt_ht <- ggplot(exp_had) +
+  geom_line(aes(x = `Target Qubit`, y = `Runtime per Gate`, 
+                colour = Communication)) + 
+  scale_x_continuous(breaks = 0:18 * 2) + 
+  scale_y_continuous(breaks = 0:10) + 
+  scale_colour_brewer(palette = "Set2") + 
+  labs(x = "Target qubit index", y = "Runtime per gate [s]") + 
+  theme_light()
+
+plt_ht
+ggsave("plt/hbench-runtime.pdf", width = 8, height = 5, units = "in")
+```
+
+```{r plot-hadamard-energy}
+plt_he <- ggplot(exp_had) +
+  geom_line(aes(x = `Target Qubit`, y = `Energy per Gate` / 1000, 
+                colour = Communication)) + 
+  scale_x_continuous(breaks = 0:18 * 2) + 
+  scale_y_continuous(breaks = 0:10 * 20) + 
+  scale_colour_brewer(palette = "Set2") + 
+  labs(x = "Target qubit index", y = "Energy per gate [kJ]") + 
+  theme_light()
+
+plt_he
+ggsave("plt/hbench-energy.pdf", width = 8, height = 5, units = "in")
+```
+
+```{r process-swap}
+exp_swap_bl <- transmute(
+  exp_swap_bl,
+  Communication = "Blocking", 
+  `First Target Qubit` = TARGET_IDX_1, 
+  `Second Target Qubit` = TARGET_IDX_2, 
+  `Runtime per Gate` = RUNTIME / NGATES_SWAP, 
+  `Energy per Gate` = (ENERGY + 1880 * RUNTIME) / NGATES_SWAP
+)
+
+exp_swap_nb <- transmute(
+  exp_swap_nb,
+  Communication = "Nonblocking", 
+  `First Target Qubit` = TARGET_IDX_1, 
+  `Second Target Qubit` = TARGET_IDX_2, 
+  `Runtime per Gate` = RUNTIME / NGATES_SWAP, 
+  `Energy per Gate` = (ENERGY + 1880 * RUNTIME) / NGATES_SWAP
+)
+
+exp_swap <- bind_rows(exp_swap_bl, exp_swap_nb) |> 
+  mutate(Communication = as.factor(Communication))
+exp_swap <- arrange(exp_swap, `First Target Qubit`, `Second Target Qubit`)
+
+levels_t1 <- paste0("T1 = ", exp_swap$`First Target Qubit`) |> 
+  unique()
+levels_t2 <- paste0("T2 = ", exp_swap$`Second Target Qubit`) |> unique()
+
+exp_swap <- mutate(
+  exp_swap, 
+  `First Target Qubit` = paste0("T1 = ", `First Target Qubit`) |> 
+    factor(levels = levels_t1), 
+  `Second Target Qubit` = paste0("T2 = ", `Second Target Qubit`) |> 
+    factor(levels = levels_t2)
+)
+```
+
+```{r plot-swap-runtime}
+plt_st <- ggplot(exp_swap) +
+  geom_bar(aes(x = Communication, y = `Runtime per Gate`, fill = Communication), 
+           stat = "Identity") +
+  coord_cartesian(ylim = c(7.8, 10.2)) + 
+  facet_grid(`Second Target Qubit` ~ `First Target Qubit`) + 
+  theme_light() + 
+  theme(axis.title.x = element_blank(), axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(), legend.position = "bottom") + 
+  scale_y_continuous(breaks = 16:20 / 2) + 
+  scale_fill_brewer(palette = "Set2") + 
+  labs(y = "Runtime per gate [s]")
+
+plt_st
+ggsave("plt/swapbench-runtime.pdf", width = 5, height = 5, units = "in")
+```
+
+```{r plot-swap-energy}
+plt_se <- ggplot(exp_swap) +
+  geom_bar(aes(x = Communication, y = `Energy per Gate` / 1000, 
+               fill = Communication), stat = "Identity") +
+  coord_cartesian(ylim = c(150, 200)) + 
+  facet_grid(`Second Target Qubit` ~ `First Target Qubit`) + 
+  theme_light() + 
+  theme(axis.title.x = element_blank(), axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(), legend.position = "bottom") + 
+  scale_y_continuous(breaks = 15:20 * 10) + 
+  scale_fill_brewer(palette = "Set2") + 
+  labs(y = "Energy per gate [kJ]")
+
+plt_se
+ggsave("plt/swapbench-energy.pdf", width = 8, height = 5, units = "in", 
+       scale = 0.75)
+```
+
+```{r manual-profile-data}
+profs <- tribble(
+  ~Program,                ~Communication,  ~MPI, ~MEM, ~COMP, 
+  "QFT (built-in)",        "Blocking",      43.1, 33.4, 23.5, 
+  "QFT (built-in)",        "Nonblocking",   39.6, 37.9, 22.5, 
+  "QFT (cache-blocking)",  "Blocking",      28.9, 50.5, 20.6, 
+  "QFT (cache-blocking)",  "Nonblocking",   24.9, 49.1, 26.0, 
+  "H-gate benchmark",      "Blocking",      88.5, 10.7, 0.8, 
+  "H-gate benchmark",      "Nonblocking",   86.7, 9.1,  4.2
+)
+
+
+profs <- pivot_longer(profs, c(MPI, MEM, COMP), names_to = "Runtime", 
+                      values_to = "Fraction")
+
+profs <- mutate(profs, across(c(Program, Communication, Runtime), as.factor))
+profs <- mutate(profs, Fraction = Fraction / 100)
+```
+
+```{r plot-profiles}
+plt_profs <- ggplot(profs) + 
+  geom_bar(aes(x = Communication, y = Fraction, fill = Runtime), 
+           stat = "Identity") + 
+  facet_wrap(~Program) + 
+  scale_y_continuous(breaks = 0:5 / 5, labels = scales::percent) + 
+  scale_fill_brewer(name = "Runtime: ", palette = "Set2") + 
+  theme_light() + 
+  theme(legend.position = "top")
+
+plt_profs
+ggsave("plt/opt-profiles.pdf", width = 8, height = 5, units = "in", 
+       scale = 0.75)
+```

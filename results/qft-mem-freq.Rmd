@@ -1,0 +1,165 @@
+---
+title: "QFT Frequency and Memory Experiments"
+author: "Jakub Adamski"
+date: '`r Sys.Date()`'
+knit: (\(inputFile, encoding) {
+        out_dir <- "rmd";
+        inputFile |> rmarkdown::render(
+          encoding = encoding, 
+          output_dir= file.path(dirname(inputFile), out_dir)
+        )
+      })
+output:
+  html_document: 
+    theme:
+      base_font:
+        google: Prompt
+      heading_font:
+        google: Proza Libre
+---
+
+```{r setup, include = FALSE}
+library(latex2exp)
+library(patchwork)
+library(tidyverse)
+```
+
+
+```{r load-data, include = FALSE}
+exp_st_lf <- read_delim("tmp/qft-st-lf.csv", delim = ',') |> 
+  mutate(Memory = "standard", `CPU Frequency` = "2.00 GHz")
+exp_st_hf <- read_delim("tmp/qft-st-hf.csv", delim = ',') |> 
+  mutate(Memory = "standard", `CPU Frequency` = "2.25 GHz")
+exp_hm_lf <- read_delim("tmp/qft-hm-lf.csv", delim = ',') |> 
+  mutate(Memory = "highmem", `CPU Frequency` = "2.00 GHz")
+exp_hm_hf <- read_delim("tmp/qft-hm-hf.csv", delim = ',') |> 
+  mutate(Memory = "highmem", `CPU Frequency` = "2.25 GHz")
+
+exp_all <- bind_rows(exp_st_lf, exp_st_hf, exp_hm_lf, exp_hm_hf)
+```
+
+```{r helper-functions, include = FALSE}
+extract_energy <- function(s) {
+    e <- str_extract(s, "[0-9.]+[A-Z]$")
+
+    # Multipliers for parsing integers with K/M/G suffixes
+    suf <- str_extract(e, "[A-Z]$")
+    mul <- integer(length(suf))
+    mul[suf == "K"] <- 1E3
+    mul[suf == "M"] <- 1E6
+    mul[suf == "G"] <- 1E9
+
+    e <- str_remove(e, "[A-Z]$")
+    as.numeric(e) * mul
+}
+```
+
+```{r process-data, include = FALSE}
+exp_pre_upgrade  <- filter(exp_all, is.na(Notes)) |> 
+  mutate(Notes = "pre-upgrade")
+exp_post_upgrade <- filter(exp_all, Notes == "upgraded system") |> 
+  mutate(Notes = "post-upgrade")
+
+exp_all <- bind_rows(exp_pre_upgrade, exp_post_upgrade)
+
+SWITCH_POWER <- 235
+exp_all <- mutate(exp_all, NSwitches = ceiling(Nodes / 8)) |> 
+  mutate(`Switches Energy` = `QFT run time (sec)` * SWITCH_POWER * NSwitches)
+
+exp_all <- mutate(exp_all, Energy = extract_energy(energy)) |> 
+  mutate(`Total Energy` = Energy + `Switches Energy`)
+
+exp_all <- transmute(
+  exp_all, 
+  NQubits   = `Number of qubits`, 
+  NNodes    =  Nodes, 
+  Runtime   = `QFT run time (sec)`, 
+  Energy    = `Total Energy`, 
+  Upgrade   =  Notes, 
+  Memory    =  Memory, 
+  Frequency = `CPU Frequency`
+)
+
+# Choose post-upgrade over pre-upgrade where possible
+selectf <- \(x, by, val) ifelse(length(x) > 1, x[by == val], x) 
+exp_all <- group_by(exp_all, NQubits, NNodes, Memory, Frequency) |> 
+  summarise(across(c(Runtime, Energy, Upgrade), 
+                   ~selectf(., Upgrade, "post-upgrade")))
+
+exp_all <- group_by(exp_all, `Node Type` = paste0(Memory, ", ", Frequency))
+```
+
+```{r plot-data-runtime}
+plt_runtime <- ggplot(exp_all) + 
+  geom_point(aes(x = NQubits, y = Runtime, colour = `Node Type`)) + 
+  scale_x_continuous(breaks = 33:44) + 
+  labs(x = "Number of qubits", y = "Runtime [s]") + 
+  scale_colour_brewer(name = "Node type: ", palette = "Set2") + 
+  theme_light() + 
+  theme(legend.position = "top", legend.spacing.y = unit(0, 'cm')) + 
+  guides(colour = guide_legend(nrow = 2, byrow = TRUE))
+
+plt_runtime
+ggsave("plt/runtime-mem-freq-qft.pdf", width = 8, height = 5, units = "in", 
+       scale = 0.75)
+```
+
+```{r plot-data-energy}
+plt_energy <- ggplot(exp_all) + 
+  geom_point(aes(x = NQubits, y = Energy / 1e6, colour = `Node Type`)) + 
+  scale_x_continuous(breaks = 33:44) + 
+  labs(x = "Number of qubits", y = "Energy [MJ]") + 
+  scale_y_log10() + 
+  scale_colour_brewer(name = "Node type: ", palette = "Set2") + 
+  theme_light() + theme(legend.position = "top")
+
+plt_energy
+```
+
+```{r make-fractional-data}
+exp_frac <- filter(exp_all, NNodes > 1) |> 
+  group_by(NQubits) |> 
+  mutate(
+    `Runtime PC` = Runtime / Runtime[`Node Type` == "standard, 2.00 GHz"], 
+    `Energy PC`  = Energy / Energy[`Node Type` == "standard, 2.00 GHz"]
+  )
+  
+  # group_by(exp_all, NQubits, Memory, Frequency) |> 
+  # summarise(across(c(Runtime, Energy, Upgrade), 
+  #                  ~selectf(., NNodes, min(NNodes)))) |> 
+  # filter(NQu)
+
+plt_frac_base <- ggplot(exp_frac) + 
+  scale_x_continuous(breaks = 17:22 * 2) + 
+  scale_colour_brewer(name = "Node type: ", palette = "Set2") + 
+  theme_light()  + 
+  theme(legend.position = "top", legend.spacing.y = unit(0, 'cm')) + 
+  guides(colour = guide_legend(nrow = 2, byrow = TRUE))
+  
+plt_frac_runtime <- plt_frac_base + 
+  geom_point(aes(x = NQubits, y = `Runtime PC`, colour = `Node Type`)) + 
+  geom_line(aes(x = NQubits, y = `Runtime PC`, colour = `Node Type`)) + 
+  geom_text(data = filter(exp_frac, `Node Type` == "standard, 2.00 GHz"), 
+            mapping = aes(x = NQubits, y = 1.05, 
+                          label = paste(round(Runtime, 1), "s")), 
+            size = 2.5, colour = "#304070", angle = 90, hjust = 0,
+            alpha = 0.8) + 
+  scale_y_continuous(breaks = 5:9 / 5, labels = scales::percent) + 
+  labs(x = "Number of qubits", y = "Runtime wrt. default")
+
+plt_frac_energy <- plt_frac_base + 
+  geom_point(aes(x = NQubits, y = `Energy PC`, colour = `Node Type`)) + 
+  geom_line(aes(x = NQubits, y = `Energy PC`, colour = `Node Type`)) + 
+  geom_text(data = filter(exp_frac, `Node Type` == "standard, 2.00 GHz"), 
+            mapping = aes(x = NQubits, y = 1.025, 
+                          label = paste(round(Energy / 1e6, 1), "MJ")), 
+            size = 2.5, colour = "#304070", angle = 90, hjust = 0, 
+            alpha = 0.8) + 
+  scale_y_continuous(labels = scales::percent) + 
+  labs(x = "Number of qubits", y = "Energy wrt. default")
+
+plt_frac_runtime + plt_frac_energy + plot_layout(guides = "collect") & 
+  theme(legend.position = "top")
+ggsave("plt/runtime-energy-percs-qft.pdf", width = 8, height = 5, units = "in", 
+       scale = 0.75)
+```

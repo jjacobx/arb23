@@ -1,0 +1,47 @@
+#!/bin/bash
+
+PROFILING=0
+LARGE_MSG_SIZE=$((2 ** 60))
+
+BUILD_DIR=build
+SOURCE_DIR=QuEST
+
+while getopts t:d:lpbs flag
+do
+    case "${flag}" in
+        t) TARGET=${OPTARG};;
+        d) BUILD_DIR=${OPTARG};;
+        l) CFLAGS="${CFLAGS} -DMPI_MAX_AMPS_IN_MSG=${LARGE_MSG_SIZE}";; # broken
+        p) PROFILING=1;;
+        b) CFLAGS="${CFLAGS} -DNONBLOCKING_EXCHANGE=1";;
+        s) CFLAGS="${CFLAGS} -DOPTIMISED_SWAP=1";;
+    esac
+done
+
+echo ${CFLAGS}
+
+mkdir -p ${BUILD_DIR}
+cd ${BUILD_DIR}
+
+
+USER_SOURCE=../circuits/${TARGET}.cpp
+OUTPUT_EXE=${TARGET}
+DISTRIBUTED=1
+MULTITHREADED=1
+GPUACCELERATED=0
+
+CC=cc
+CXX=CC
+
+
+
+cmake ../${SOURCE_DIR} \
+  -DCMAKE_C_COMPILER=${CC} \
+  -DCMAKE_CXX_COMPILER=${CXX} \
+  -DCMAKE_C_FLAGS="${CFLAGS}" \
+  -DUSER_SOURCE=${USER_SOURCE} \
+  -DOUTPUT_EXE=${OUTPUT_EXE} \
+  -DDISTRIBUTED=${DISTRIBUTED} \
+  -DMULTITHREADED=${MULTITHREADED} \
+  -DGPUACCELERATED=${GPUACCELERATED} \
+  -DPROFILING=${PROFILING}

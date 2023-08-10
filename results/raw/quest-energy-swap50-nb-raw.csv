@@ -1,0 +1,151 @@
+SLURM_JOB_ID,SLURM_JOB_NAME,SLURM_JOB_NUM_NODES,SLURM_NTASKS,SLURM_NTASKS_PER_NODE,SLURM_CPUS_PER_TASK,SLURM_CPU_FREQ_REQ,OMP_NUM_THREADS,PROG,QREG_SIZE,TARGET_IDX_1,TARGET_IDX_2,NGATES,OUTPUT,HAS_ERRORS
+4104652,s-0-35n,64,64,1,128,2000000,128,swapbench,38,0,35,50,"Verbose is ON
+No. processes: 64
+No. qubits: 38
+Non-blocking exchange flag: 1
+Optimised SWAP flag: 0
+Time taken: 445041 ms
+
+JobID           Elapsed ConsumedEnergy 
+------------ ---------- -------------- 
+4104652.0      00:07:31          8.11M ",FALSE
+4104654,s-0-36n,64,64,1,128,2000000,128,swapbench,38,0,36,50,"Verbose is ON
+No. processes: 64
+No. qubits: 38
+Non-blocking exchange flag: 1
+Optimised SWAP flag: 0
+Time taken: 443048 ms
+
+JobID           Elapsed ConsumedEnergy 
+------------ ---------- -------------- 
+4104654.0      00:07:29          8.02M ",FALSE
+4104656,s-0-37n,64,64,1,128,2000000,128,swapbench,38,0,37,50,"Verbose is ON
+No. processes: 64
+No. qubits: 38
+Non-blocking exchange flag: 1
+Optimised SWAP flag: 0
+Time taken: 442118 ms
+
+JobID           Elapsed ConsumedEnergy 
+------------ ---------- -------------- 
+4104656.0      00:07:28          8.05M ",FALSE
+4104658,s-4-35n,64,64,1,128,2000000,128,swapbench,38,4,35,50,"Verbose is ON
+No. processes: 64
+No. qubits: 38
+Non-blocking exchange flag: 1
+Optimised SWAP flag: 0
+Time taken: 431092 ms
+
+JobID           Elapsed ConsumedEnergy 
+------------ ---------- -------------- 
+4104658.0      00:07:18          7.98M ",FALSE
+4104660,s-4-36n,64,64,1,128,2000000,128,swapbench,38,4,36,50,"Verbose is ON
+No. processes: 64
+No. qubits: 38
+Non-blocking exchange flag: 1
+Optimised SWAP flag: 0
+Time taken: 428925 ms
+
+JobID           Elapsed ConsumedEnergy 
+------------ ---------- -------------- 
+4104660.0      00:07:17          7.80M ",FALSE
+4104662,s-4-37n,64,64,1,128,2000000,128,swapbench,38,4,37,50,"Verbose is ON
+No. processes: 64
+No. qubits: 38
+Non-blocking exchange flag: 1
+Optimised SWAP flag: 0
+Time taken: 430172 ms
+
+JobID           Elapsed ConsumedEnergy 
+------------ ---------- -------------- 
+4104662.0      00:07:17          7.93M ",FALSE
+4104664,s-8-35n,64,64,1,128,2000000,128,swapbench,38,8,35,50,"Verbose is ON
+No. processes: 64
+No. qubits: 38
+Non-blocking exchange flag: 1
+Optimised SWAP flag: 0
+Time taken: 420681 ms
+
+JobID           Elapsed ConsumedEnergy 
+------------ ---------- -------------- 
+4104664.0      00:07:09          7.77M ",FALSE
+4104666,s-8-36n,64,64,1,128,2000000,128,swapbench,38,8,36,50,"Verbose is ON
+No. processes: 64
+No. qubits: 38
+Non-blocking exchange flag: 1
+Optimised SWAP flag: 0
+Time taken: 419819 ms
+
+JobID           Elapsed ConsumedEnergy 
+------------ ---------- -------------- 
+4104666.0      00:07:11          7.59M ",FALSE
+4104668,s-8-37n,64,64,1,128,2000000,128,swapbench,38,8,37,50,"Verbose is ON
+No. processes: 64
+No. qubits: 38
+Non-blocking exchange flag: 1
+Optimised SWAP flag: 0
+Time taken: 421914 ms
+
+JobID           Elapsed ConsumedEnergy 
+------------ ---------- -------------- 
+4104668.0      00:07:14          7.85M ",FALSE
+4104670,s-12-35n,64,64,1,128,2000000,128,swapbench,38,12,35,50,"Verbose is ON
+No. processes: 64
+No. qubits: 38
+Non-blocking exchange flag: 1
+Optimised SWAP flag: 0
+Time taken: 412387 ms
+
+JobID           Elapsed ConsumedEnergy 
+------------ ---------- -------------- 
+4104670.0      00:06:58          7.38M ",FALSE
+4104672,s-12-36n,64,64,1,128,2000000,128,swapbench,38,12,36,50,"Verbose is ON
+No. processes: 64
+No. qubits: 38
+Non-blocking exchange flag: 1
+Optimised SWAP flag: 0
+Time taken: 411187 ms
+
+JobID           Elapsed ConsumedEnergy 
+------------ ---------- -------------- 
+4104672.0      00:06:58          7.36M ",FALSE
+4104674,s-12-37n,64,64,1,128,2000000,128,swapbench,38,12,37,50,"Verbose is ON
+No. processes: 64
+No. qubits: 38
+Non-blocking exchange flag: 1
+Optimised SWAP flag: 0
+Time taken: 411155 ms
+
+JobID           Elapsed ConsumedEnergy 
+------------ ---------- -------------- 
+4104674.0      00:06:58          7.26M ",FALSE
+4104676,s-16-35n,64,64,1,128,2000000,128,swapbench,38,16,35,50,"Verbose is ON
+No. processes: 64
+No. qubits: 38
+Non-blocking exchange flag: 1
+Optimised SWAP flag: 0
+Time taken: 410345 ms
+
+JobID           Elapsed ConsumedEnergy 
+------------ ---------- -------------- 
+4104676.0      00:06:56          7.54M ",FALSE
+4104678,s-16-36n,64,64,1,128,2000000,128,swapbench,38,16,36,50,"Verbose is ON
+No. processes: 64
+No. qubits: 38
+Non-blocking exchange flag: 1
+Optimised SWAP flag: 0
+Time taken: 413009 ms
+
+JobID           Elapsed ConsumedEnergy 
+------------ ---------- -------------- 
+4104678.0      00:06:59          7.84M ",FALSE
+4104680,s-16-37n,64,64,1,128,2000000,128,swapbench,38,16,37,50,"Verbose is ON
+No. processes: 64
+No. qubits: 38
+Non-blocking exchange flag: 1
+Optimised SWAP flag: 0
+Time taken: 411794 ms
+
+JobID           Elapsed ConsumedEnergy 
+------------ ---------- -------------- 
+4104680.0      00:06:58          7.40M ",FALSE

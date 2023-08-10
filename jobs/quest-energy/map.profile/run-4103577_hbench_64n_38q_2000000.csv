@@ -1,0 +1,73 @@
+Name,Value
+Executable,hbench
+Command,"/mnt/lustre/a2fs-work1/work/d35/d35/kubad35/quantum-circuits/build/hbench -q 38 -t 37 -n 50"
+"Nodes (nodes)",64
+"Physical cores per node (cores/node)",128
+"Logical cores per node (cores/node)",256
+"Memory per node (B)",269662174976
+"Tasks (processes)",64
+"Profiled ranks",
+"OpenMP threads",128
+Machine,nid004200
+"Start time","Tue Aug 1 14:45:26 2023"
+"Total time (seconds)",476
+"Full path",/mnt/lustre/a2fs-work1/work/d35/d35/kubad35/quantum-circuits/build
+"Input file",
+Notes,
+Bound,MPI-bound
+
+"Compute (%)",13.34134615384616
+"MPI (%)",86.65865384615384
+"I/O (%)",0
+"Overview advice",
+
+"CPU Single-core code (%)",0.054600054600107334
+"CPU OpenMP regions (%)",99.9453999453999
+"CPU ",
+"CPU Scalar numeric ops (%)",31.881599276399136
+"CPU Vector numeric ops (%)",0
+"CPU Memory accesses (%)",68.11840072360087
+"CPU Advice 1","The per-core performance is memory-bound. Use a profiler to identify time-consuming loops and check their cache performance."
+"CPU Advice 2","No time is spent in vectorized instructions. Check the compiler's vectorization advice to see why key loops could not be vectorized."
+"CPU Error",
+
+"MPI Time in collective calls (%)",3.618711385701677
+"MPI Time in point-to-point calls (%)",96.38128861429831
+"MPI Effective process collective rate (B/s)",0.687278114843152
+"MPI Effective process point-to-point rate (B/s)",17146922136.674755
+"MPI Advice 1","Most of the time is spent in point-to-point calls with a high transfer rate. It may be possible to improve this further by overlapping communication and computation or reducing the amount of communication required."
+"MPI Advice 2",
+"MPI Error",
+
+"I/O Time in reads (%)",0
+"I/O Time in writes (%)",0
+"I/O Effective process read rate (B/s)",0
+"I/O Effective process write rate (B/s)",0
+"I/O Advice 1","No time is spent in I/O operations. There's nothing to optimize here!"
+"I/O Advice 2",
+"I/O Error",
+
+"OpenMP Computation (%)",97.11987789127626
+"OpenMP Synchronization (%)",2.8801221087237283
+"OpenMP Physical core utilization (%)",100
+"OpenMP System load (%)",14.068674652170746
+"OpenMP Advice 1","OpenMP thread performance looks good. Check the CPU breakdown for advice on improving code efficiency."
+"OpenMP Advice 2",
+"OpenMP Error",
+
+"Memory Mean process memory usage (B)",137007777595.97203
+"Memory Peak process memory usage (B)",137578606592
+"Memory Peak node memory usage (%)",56
+"Memory Advice 1","The peak node memory usage is modest. Running with fewer MPI processes and more data on each process may be more efficient."
+"Memory Advice 2",
+"Memory Error",
+
+"Energy CPU (%)",
+"Energy System (%)",100
+"Energy Mean node power (W)",257.50174825174827
+"Energy Peak node power (W)",356
+"Energy Total (Wh)",2111.7869444444445
+"Energy Advice 1","CPU metrics: Error reading /sys/class/powercap/intel-rapl:0/energy_uj: Permission denied"
+"Energy Advice 2",
+"Energy Error",
+
