@@ -62,12 +62,17 @@ plt_ht <- ggplot(exp_had) +
                 colour = Communication)) + 
   scale_x_continuous(breaks = 0:18 * 2) + 
   scale_y_continuous(breaks = 0:10) + 
-  scale_colour_brewer(palette = "Set2") + 
+  scale_colour_brewer(palette = "Set1") + 
   labs(x = "Target qubit index", y = "Runtime per gate [s]") + 
-  theme_light()
+  theme_gray() + 
+  theme(rect = element_rect(fill = "transparent", linewidth = 0), 
+        panel.background = element_rect(fill = "#A9D3CD", linewidth = 0), 
+        legend.key = element_rect(fill = "#A9D3CD"), 
+        legend.position = "top")
 
 plt_ht
 ggsave("plt/hbench-runtime.pdf", width = 8, height = 5, units = "in")
+ggsave("plt/hbench-runtime.svg", width = 5, height = 4, units = "in")
 ```
 
 ```{r plot-hadamard-energy}
@@ -82,6 +87,7 @@ plt_he <- ggplot(exp_had) +
 
 plt_he
 ggsave("plt/hbench-energy.pdf", width = 8, height = 5, units = "in")
+ggsave("plt/hbench-energy.svg", width = 8, height = 5, units = "in")
 ```
 
 ```{r process-swap}
@@ -180,11 +186,18 @@ plt_profs <- ggplot(profs) +
            stat = "Identity") + 
   facet_wrap(~Program) + 
   scale_y_continuous(breaks = 0:5 / 5, labels = scales::percent) + 
-  scale_fill_brewer(name = "Runtime: ", palette = "Set2") + 
-  theme_light() + 
-  theme(legend.position = "top")
+  scale_fill_brewer(name = "Runtime: ", palette = "Set1") + 
+  theme_gray() + 
+  theme(rect = element_rect(fill = "transparent", linewidth = 0), 
+        panel.background = element_rect(fill = "#A9D3CD", linewidth = 0), 
+        legend.key = element_rect(fill = "#A9D3CD"), 
+        strip.background = element_rect(fill = "seagreen"), 
+        strip.text = element_text(colour = 'lightgray'), 
+        legend.position = "top")
 
 plt_profs
 ggsave("plt/opt-profiles.pdf", width = 8, height = 5, units = "in", 
+       scale = 0.75)
+ggsave("plt/opt-profiles.svg", width = 8, height = 5, units = "in", 
        scale = 0.75)
 ```

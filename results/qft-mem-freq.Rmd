@@ -131,8 +131,8 @@ exp_frac <- filter(exp_all, NNodes > 1) |>
 
 plt_frac_base <- ggplot(exp_frac) + 
   scale_x_continuous(breaks = 17:22 * 2) + 
-  scale_colour_brewer(name = "Node type: ", palette = "Set2") + 
-  theme_light()  + 
+  scale_colour_brewer(name = "Node type: ", palette = "Set1") + 
+  theme_gray()  + 
   theme(legend.position = "top", legend.spacing.y = unit(0, 'cm')) + 
   guides(colour = guide_legend(nrow = 2, byrow = TRUE))
   
@@ -159,7 +159,12 @@ plt_frac_energy <- plt_frac_base +
   labs(x = "Number of qubits", y = "Energy wrt. default")
 
 plt_frac_runtime + plt_frac_energy + plot_layout(guides = "collect") & 
-  theme(legend.position = "top")
+  theme(rect = element_rect(fill = "transparent", linewidth = 0), 
+        panel.background = element_rect(fill = "#A9D3CD", linewidth = 0), 
+        legend.key = element_rect(fill = "#A9D3CD"), 
+        legend.position = "top")
 ggsave("plt/runtime-energy-percs-qft.pdf", width = 8, height = 5, units = "in", 
+       scale = 0.75)
+ggsave("plt/runtime-energy-percs-qft.svg", width = 8, height = 5, units = "in", 
        scale = 0.75)
 ```
